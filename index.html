@@ -3,231 +3,410 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TRẦN PHÚ MUSIC | FINAL 2026</title>
+    <title>TRẦN PHÚ MUSIC | OFFICIAL 2026</title>
     
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        :root { --p: #1DB954; --bg: #050505; --card: #121212; --text: #ffffff; --sub: #b3b3b3; }
+        :root { --p: #1DB954; --bg: #050505; --card: #121212; --text: #ffffff; --sub: #b3b3b3; --glass: rgba(255, 255, 255, 0.05); }
         body, html { margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
         
-        #login-screen { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; align-items: center; justify-content: center; }
-        .login-card { background: var(--card); padding: 40px; border-radius: 20px; text-align: center; width: 90%; max-width: 380px; border: 1px solid #333; }
-        .ava-p { width: 65px; height: 65px; border-radius: 50%; border: 3px solid transparent; cursor: pointer; margin: 10px; transition: 0.3s; }
-        .ava-p.active { border-color: var(--p); transform: scale(1.1); }
-        
-        input { width: 100%; padding: 14px; margin-bottom: 12px; border-radius: 10px; border: 1px solid #333; background: #000; color: #fff; box-sizing: border-box; outline: none; }
-        .btn-p { background: var(--p); color: #000; border: none; padding: 14px; border-radius: 30px; font-weight: bold; cursor: pointer; width: 100%; }
+        /* NỀN ĐỘNG */
+        .bg-glow { position: fixed; inset: 0; background: radial-gradient(circle at 20% 30%, #1db95422, transparent), radial-gradient(circle at 80% 70%, #1db95411, transparent); z-index: -1; }
 
+        /* ĐĂNG NHẬP */
+        #login-screen { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; align-items: center; justify-content: center; }
+        .login-card { background: var(--card); padding: 40px; border-radius: 24px; text-align: center; width: 90%; max-width: 400px; border: 1px solid #333; box-shadow: 0 20px 60px rgba(0,0,0,0.8); }
+        .ava-p { width: 70px; height: 70px; border-radius: 50%; border: 3px solid transparent; cursor: pointer; transition: 0.3s; margin: 10px; }
+        .ava-p.active { border-color: var(--p); transform: scale(1.15); box-shadow: 0 0 20px var(--p); }
+        input { width: 100%; padding: 15px; margin-bottom: 15px; border-radius: 12px; border: 1px solid #333; background: #000; color: #fff; box-sizing: border-box; outline: none; }
+        .btn-p { background: var(--p); color: #000; border: none; padding: 15px; border-radius: 30px; font-weight: 800; cursor: pointer; width: 100%; transition: 0.3s; }
+        .btn-p:hover { transform: scale(1.05); background: #1ed760; }
+
+        /* LAYOUT CHÍNH */
         #main-app { display: none; height: 100vh; grid-template-columns: 260px 1fr 320px; grid-template-rows: 1fr 100px; }
-        .sidebar { background: #000; padding: 25px; border-right: 1px solid #222; }
-        .content { background: linear-gradient(to bottom, #181818, #050505); overflow-y: auto; padding: 30px; }
+        .sidebar { background: #000; padding: 25px; display: flex; flex-direction: column; gap: 8px; border-right: 1px solid #222; }
+        .content { background: linear-gradient(180deg, #181818 0%, #050505 100%); overflow-y: auto; padding: 30px; position: relative; }
         .right-bar { background: #000; border-left: 1px solid #222; padding: 20px; display: flex; flex-direction: column; }
         
-        .nav-item { padding: 12px; color: var(--sub); cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 12px; border-radius: 10px; }
-        .nav-item.active { color: #fff; background: rgba(255,255,255,0.1); }
+        .nav-item { padding: 12px 16px; color: var(--sub); cursor: pointer; font-weight: 700; display: flex; align-items: center; gap: 15px; border-radius: 12px; transition: 0.2s; }
+        .nav-item:hover, .nav-item.active { color: #fff; background: var(--glass); }
 
-        .song-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; }
-        .song-card { background: #181818; padding: 15px; border-radius: 12px; cursor: pointer; text-align: center; }
-        .song-card img { width: 100%; border-radius: 10px; }
+        /* MOMENTS & POSTS */
+        .post-card { background: var(--card); border-radius: 16px; margin-bottom: 20px; border: 1px solid #222; overflow: hidden; }
+        .post-img { width: 100%; max-height: 450px; object-fit: cover; cursor: pointer; }
 
-        .chat-box { flex: 1; overflow-y: auto; margin-bottom: 10px; }
-        .msg { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 10px; margin-bottom: 8px; font-size: 14px; position: relative; }
+        /* CHAT */
+        .chat-box { flex: 1; overflow-y: auto; padding-right: 5px; scroll-behavior: smooth; }
+        .msg { background: var(--glass); padding: 12px; border-radius: 15px; margin-bottom: 10px; font-size: 14px; position: relative; border: 1px solid rgba(255,255,255,0.03); }
+        .msg b { color: var(--p); display: block; margin-bottom: 4px; }
+
+        /* PLAYER */
+        .player { grid-column: 1 / 4; background: #000; border-top: 1px solid #222; display: flex; align-items: center; padding: 0 30px; justify-content: space-between; z-index: 100; }
+        .p-btn { font-size: 22px; color: var(--sub); cursor: pointer; transition: 0.2s; }
+        .p-btn:hover { color: #fff; transform: scale(1.1); }
         
-        .player { grid-column: 1 / 4; background: #000; border-top: 1px solid #222; display: flex; align-items: center; padding: 0 30px; justify-content: space-between; }
-        
-        @media (max-width: 1000px) { #main-app { grid-template-columns: 1fr; } .sidebar, .right-bar { display: none; } }
+        @media (max-width: 1000px) { 
+            #main-app { grid-template-columns: 1fr; } 
+            .sidebar, .right-bar { display: none; } 
+            .player { padding: 0 15px; }
+            .player div:last-child { display: none; }
+        }
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
+<div class="bg-glow"></div>
+
 <div id="login-screen">
     <div class="login-card">
-        <h2 style="color:var(--p)">TRẦN PHÚ MUSIC</h2>
+        <i class="fa-solid fa-graduation-cap" style="font-size: 50px; color: var(--p)"></i>
+        <h2 style="margin: 15px 0 5px 0">TRẦN PHÚ MUSIC</h2>
+        <p style="color:var(--sub); font-size:12px; margin-bottom: 20px">Kênh âm nhạc chính thức THPT Trần Phú</p>
+        
         <div class="ava-box">
             <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" class="ava-p active" onclick="selAva(this)">
             <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Aneka" class="ava-p" onclick="selAva(this)">
         </div>
-        <input type="text" id="u-name" placeholder="Tên đăng nhập">
+        
+        <input type="text" id="u-name" placeholder="Tên của bạn">
         <input type="password" id="u-pass" placeholder="Mật khẩu">
-        <button class="btn-p" onclick="login()">ĐĂNG NHẬP</button>
+        <button class="btn-p" onclick="login()">BẮT ĐẦU TRẢI NGHIỆM</button>
     </div>
 </div>
 
 <div id="main-app">
     <div class="sidebar">
-        <h3 style="color:var(--p)">TRẦN PHÚ</h3>
-        <div class="nav-item active" onclick="tab('home')"><i class="fa-solid fa-house"></i> Trang chủ</div>
-        <div class="nav-item" onclick="tab('moments')"><i class="fa-solid fa-clapperboard"></i> Khoảnh khắc</div>
-        <div class="nav-item" onclick="tab('rank')"><i class="fa-solid fa-chart-line"></i> Xếp hạng</div>
-        <div id="adm-link" class="nav-item hidden" onclick="tab('admin')" style="color:var(--p)"><i class="fa-solid fa-shield"></i> ADMIN</div>
+        <div style="font-size: 22px; font-weight: 900; color: var(--p); margin-bottom: 30px; display: flex; align-items: center; gap: 10px;">
+            <i class="fa-solid fa-bolt"></i> TP MUSIC
+        </div>
+        <div class="nav-item active" onclick="tab('home')"><i class="fa-solid fa-house"></i> Khám phá</div>
+        <div class="nav-item" onclick="tab('moments')"><i class="fa-solid fa-clapperboard"></i> Moments</div>
+        <div class="nav-item" onclick="tab('rank')"><i class="fa-solid fa-trophy"></i> BXH Đóng góp</div>
+        <div class="nav-item" onclick="tab('settings')"><i class="fa-solid fa-sliders"></i> Cài đặt</div>
+        <div id="adm-link" class="nav-item hidden" onclick="tab('admin')" style="color:var(--p); border-top: 1px solid #222; margin-top: 15px; padding-top: 15px;"><i class="fa-solid fa-shield-cat"></i> QUẢN TRỊ VIÊN</div>
         
-        <div style="margin-top:auto; background: #111; padding: 15px; border-radius: 12px; text-align: center;">
-            <img id="my-ava" style="width:50px; border-radius:50%; border:2px solid var(--p)">
-            <div id="my-name" style="font-weight:bold; margin-top:5px"></div>
-            <div id="my-pts" style="color:var(--p); font-size:12px">Điểm: 0</div>
-            <button onclick="logout()" style="color:red; background:none; border:none; cursor:pointer; font-size:11px">Đăng xuất</button>
+        <div style="margin-top:auto; background: var(--glass); padding: 20px; border-radius: 20px; text-align: center;">
+            <img id="my-ava" style="width:60px; height:60px; border-radius:50%; border:2px solid var(--p); background: #000">
+            <div id="my-name" style="font-weight:800; margin-top:10px; font-size: 14px;"></div>
+            <div id="my-pts" style="color:var(--p); font-size:12px; font-weight: bold; margin-top: 4px;">Điểm: 0</div>
+            <button onclick="logout()" style="color:#ff4d4d; background:none; border:none; margin-top:15px; cursor:pointer; font-size:11px; font-weight: 800;">ĐĂNG XUẤT</button>
         </div>
     </div>
 
     <div class="content">
         <div id="v-home" class="view">
-            <h1>Yêu cầu nhạc</h1>
-            <div style="display:flex; gap:10px; margin-bottom:30px">
-                <input type="text" id="s-req" placeholder="Tên bài hát..." style="margin:0">
-                <button class="btn-p" style="width:100px" onclick="sendReq()">GỬI</button>
+            <div style="background: linear-gradient(135deg, #1db95466, transparent); padding: 40px; border-radius: 24px; margin-bottom: 40px; border: 1px solid #1db95433">
+                <h1 id="daily-quote" style="margin:0; font-size: 32px; letter-spacing: -1px;">Đang tải lời chúc...</h1>
+                <p style="color: var(--sub); margin-top: 10px;">Gửi yêu cầu bài hát của bạn để nhận 100 điểm thưởng!</p>
+                <div style="display:flex; gap:12px; max-width:650px; margin-top:25px">
+                    <input type="text" id="s-req" placeholder="Tên bài hát hoặc link YouTube..." style="margin:0">
+                    <button class="btn-p" style="width:140px" onclick="sendReq()">GỬI YÊU CẦU</button>
+                </div>
             </div>
-            <div id="song-list" class="song-grid"></div>
+
+            <h2 style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px;"><i class="fa-solid fa-heart" style="color:#ff4d4d"></i> Đã được duyệt</h2>
+            <div id="approved-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 25px;"></div>
         </div>
 
         <div id="v-moments" class="view hidden">
-            <button class="btn-p" style="width:auto; margin-bottom:20px" onclick="post()">+ ĐĂNG BÀI</button>
-            <div id="post-list" style="max-width:500px; margin:0 auto"></div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px">
+                <h2>Khoảnh khắc Trần Phú</h2>
+                <button class="btn-p" style="width:auto; padding: 12px 25px" onclick="post()"><i class="fa-solid fa-camera"></i> CHIA SẺ ẢNH/VIDEO</button>
+            </div>
+            <div id="post-list" style="max-width:550px; margin:0 auto"></div>
         </div>
 
         <div id="v-rank" class="view hidden">
-            <h2>Bảng xếp hạng</h2>
-            <div id="rank-list"></div>
+            <h2>Top đóng góp tích cực</h2>
+            <div id="rank-list" style="background:var(--card); border-radius:20px; overflow:hidden; border: 1px solid #222;"></div>
         </div>
 
         <div id="v-admin" class="view hidden">
-            <h2>Kiểm duyệt</h2>
+            <h2 style="color:var(--p)">Bảng điều khiển tối thượng</h2>
             <div id="adm-list"></div>
+        </div>
+
+        <div id="v-settings" class="view hidden">
+            <h2>Cài đặt tài khoản</h2>
+            <div style="background: var(--card); padding: 30px; border-radius: 20px; max-width: 450px; border: 1px solid #222;">
+                <p style="margin-top:0">Đổi mật khẩu bảo mật:</p>
+                <input type="password" id="set-pass" placeholder="Mật khẩu mới">
+                <button class="btn-p" onclick="changePass()">CẬP NHẬT NGAY</button>
+            </div>
         </div>
     </div>
 
     <div class="right-bar">
-        <h3>Chat</h3>
+        <h3 style="margin:0 0 20px 0; font-size: 18px;"><i class="fa-solid fa-comments"></i> Chat Cộng Đồng</h3>
         <div id="chat-msgs" class="chat-box"></div>
-        <div style="display:flex; gap:5px">
-            <input type="text" id="c-ipt" placeholder="Nhập..." style="margin:0">
-            <button class="btn-p" style="width:50px" onclick="sendChat()">></button>
+        <div style="display:flex; gap:10px; margin-top:20px">
+            <input type="text" id="c-ipt" placeholder="Nhắn gì đó..." style="margin:0; font-size: 14px;">
+            <button class="btn-p" style="width:60px" onclick="sendChat()"><i class="fa-solid fa-paper-plane"></i></button>
         </div>
     </div>
 
     <div class="player">
-        <div style="display:flex; align-items:center; gap:15px; width:300px">
-            <img id="p-img" src="https://i.ytimg.com/vi/jfKfPfyJRdk/hqdefault.jpg" style="width:55px; border-radius:5px">
-            <div id="p-title" style="font-size:14px; font-weight:bold">Chọn bài hát</div>
+        <div style="display:flex; align-items:center; gap:15px; width:350px">
+            <img id="p-img" src="https://api.dicebear.com/7.x/shapes/svg?seed=music" style="width:65px; height:65px; border-radius:12px; object-fit: cover; border: 1px solid #333">
+            <div style="overflow: hidden;">
+                <b id="p-title" style="font-size:15px; white-space: nowrap; display: block;">Chọn nhạc để phát...</b>
+                <small style="color:var(--p); font-weight: 800; font-size: 11px;">TP MUSIC SYSTEM</small>
+            </div>
         </div>
-        <div>
-            <i class="fa-solid fa-circle-play" style="font-size:40px; cursor:pointer" onclick="shuffle()"></i>
+        <div style="text-align:center; flex:1">
+            <div style="display:flex; align-items:center; justify-content:center; gap:35px; margin-bottom:10px">
+                <i class="fa-solid fa-shuffle p-btn" onclick="shufflePlay()" title="Phát ngẫu nhiên"></i>
+                <i class="fa-solid fa-backward-step p-btn"></i>
+                <i class="fa-solid fa-circle-play p-btn" style="font-size:45px; color:#fff" id="play-icon" onclick="togglePlay()"></i>
+                <i class="fa-solid fa-forward-step p-btn" onclick="shufflePlay()"></i>
+            </div>
+            <div style="width:100%; max-width:550px; height:5px; background:#222; border-radius:10px; margin: 0 auto; overflow: hidden;">
+                <div id="p-bar" style="height:100%; background:var(--p); width:0%; transition: 0.2s;"></div>
+            </div>
         </div>
-        <div style="width:300px; text-align:right; font-size:10px; color:#555">Bản quyền Huỳnh Lưu</div>
+        <div style="width:350px; text-align:right">
+            <div style="font-size:11px; color:#444; line-height: 1.6;">
+                Bản quyền © 2026 <b>HUỲNH LƯU</b><br>
+                Điều hành: <b>CLB TRUYỀN THÔNG</b>
+            </div>
+        </div>
     </div>
 </div>
 
 <div id="yt-api" style="display:none"></div>
 
 <script>
-    // 1. CẤU HÌNH (Hãy đảm bảo link này đúng với Firebase của bạn)
-    const firebaseConfig = { 
-        databaseURL: "https://tranphumusic1-default-rtdb.firebaseio.com/" 
-    };
+    // --- CẤU HÌNH FIREBASE ---
+    const firebaseConfig = { databaseURL: "https://tranphumusic1-default-rtdb.firebaseio.com/" };
     firebase.initializeApp(firebaseConfig);
     const rdb = firebase.database();
 
     let me = JSON.parse(sessionStorage.getItem('TP_USER')) || null;
-    let selectedAva = "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix";
+    let currentAva = "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix";
+    let isPlaying = false;
+    const quotes = ["Chúc bạn một ngày học tập thật tốt!", "Âm nhạc là hơi thở của cuộc sống.", "Bạn trông thật tuyệt vời hôm nay!", "Trần Phú Music - Nơi tài năng tỏa sáng."];
 
-    window.onload = () => { if(me) launch(); };
+    window.onload = () => { 
+        document.getElementById('daily-quote').innerText = quotes[Math.floor(Math.random()*quotes.length)];
+        if(me) launch(); 
+    };
 
-    // 2. HÀM LOGIN
+    function selAva(el) {
+        document.querySelectorAll('.ava-p').forEach(i => i.classList.remove('active'));
+        el.classList.add('active');
+        currentAva = el.src;
+    }
+
     function login() {
         const u = document.getElementById('u-name').value.trim();
         const p = document.getElementById('u-pass').value;
-        if(!u || !p) return alert("Nhập đủ thông tin!");
+        if(!u || !p) return alert("Vui lòng điền đủ tên và mật khẩu!");
 
         rdb.ref('users/' + u).once('value', s => {
             let user = s.val();
             if(!user) {
-                user = { pass: p, pts: 100, ava: selectedAva, last: new Date().toDateString() };
+                user = { pass: p, pts: 100, ava: currentAva, last: new Date().toDateString() };
                 rdb.ref('users/' + u).set(user);
-            } else if(user.pass !== p) return alert("Sai mật khẩu!");
+            } else if(user.pass !== p) return alert("Mật khẩu không đúng!");
             
+            // Điểm danh ngày mới
+            if(user.last !== new Date().toDateString()) {
+                rdb.ref('users/' + u).update({ pts: (user.pts || 0) + 100, last: new Date().toDateString() });
+                alert("Bạn nhận được 100 điểm thưởng ngày mới!");
+            }
+
             me = { name: u, isAdm: (u === 'admin' && p === 'tp2026') };
             sessionStorage.setItem('TP_USER', JSON.stringify(me));
             launch();
         });
     }
 
-    // 3. HÀM HIỂN THỊ BẢNG XẾP HẠNG (FIX LỖI)
-    function renderRank() {
-        const rankList = document.getElementById('rank-list');
-        rankList.innerHTML = "<p style='padding:20px'>Đang tải dữ liệu...</p>";
+    function launch() {
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('main-app').style.display = 'grid';
+        if(me.isAdm) document.getElementById('adm-link').classList.remove('hidden');
 
-        rdb.ref('users').once('value', s => {
-            let data = s.val();
-            if(!data) return rankList.innerHTML = "Chưa có dữ liệu.";
+        // Sync Profile
+        rdb.ref('users/' + me.name).on('value', s => {
+            const d = s.val();
+            if(!d) return;
+            document.getElementById('my-ava').src = d.ava;
+            document.getElementById('my-name').innerText = me.name;
+            document.getElementById('my-pts').innerText = "Điểm: " + (d.pts || 0);
+        });
 
-            let arr = [];
+        // Chat Realtime
+        rdb.ref('chats').limitToLast(40).on('value', s => {
+            let h = ''; const data = s.val();
             for(let k in data) {
-                arr.push({ n: k, p: data[k].pts || 0, a: data[k].ava || selectedAva });
+                h += `<div class="msg">
+                    <b>${data[k].u}</b> ${data[k].m} <small style="font-size:9px; color:#555; margin-left:5px">${data[k].t || ''}</small>
+                    ${me.isAdm ? `<i class="fa-solid fa-trash" style="position:absolute; right:10px; top:10px; cursor:pointer; color:red" onclick="del('chats','${k}')"></i>` : ''}
+                </div>`;
             }
-            
-            // Sắp xếp điểm từ cao xuống thấp
-            arr.sort((a, b) => b.p - a.p);
+            const b = document.getElementById('chat-msgs'); b.innerHTML = h; b.scrollTop = b.scrollHeight;
+        });
 
-            rankList.innerHTML = arr.map((u, i) => `
+        // Load Approved Music
+        rdb.ref('approved_songs').on('value', s => {
+            let h = ''; const data = s.val();
+            for(let k in data) {
+                const s = data[k];
+                h += `<div class="song-card" style="background:var(--card); padding:15px; border-radius:15px; cursor:pointer; border: 1px solid #222" onclick="playMusic('${s.id}','${s.title}')">
+                    <img src="${s.thumb}" style="width:100%; border-radius:10px; margin-bottom:10px">
+                    <b style="font-size:14px; display:block; height:36px; overflow:hidden">${s.title}</b>
+                    <small style="color:var(--p)">Duyệt bởi: ${s.by}</small>
+                </div>`;
+            }
+            document.getElementById('approved-list').innerHTML = h || '<p>Chưa có bài hát nào được duyệt.</p>';
+        });
+
+        // Admin Request List
+        if(me.isAdm) {
+            rdb.ref('reqs').on('value', s => {
+                let h = ''; const data = s.val();
+                for(let k in data) {
+                    const r = data[k];
+                    h += `<div class="post-card" style="padding:20px; display:flex; justify-content:space-between; align-items:center">
+                        <div><b>${r.u}</b> yêu cầu: <b>${r.s}</b><br><small>${r.t}</small></div>
+                        <div style="display:flex; gap:10px">
+                            <button onclick="approve('${k}','${r.u}','${r.s}')" class="btn-p" style="width:80px; padding:8px">DUYỆT</button>
+                            <button onclick="del('reqs','${k}')" style="background:red; color:white; border:none; border-radius:8px; padding:0 15px; cursor:pointer">XÓA</button>
+                        </div>
+                    </div>`;
+                }
+                document.getElementById('adm-list').innerHTML = h;
+            });
+        }
+
+        // Moments
+        rdb.ref('posts').on('value', s => {
+            let h = ''; const data = s.val();
+            for(let k in data) {
+                const p = data[k];
+                h += `<div class="post-card">
+                    <div style="padding:15px; display:flex; align-items:center; gap:10px">
+                        <img src="${p.ava}" style="width:35px; border-radius:50%"> <b>${p.u}</b> <small style="color:#555">${p.t}</small>
+                    </div>
+                    <div style="padding:0 15px 15px">${p.m}</div>
+                    ${p.l ? `<img src="${p.l}" class="post-img" onclick="window.open('${p.l}')">` : ''}
+                    ${me.isAdm ? `<button onclick="del('posts','${k}')" style="color:red; background:none; border:none; padding:15px; font-weight:bold; cursor:pointer">XÓA BÀI ĐĂNG</button>` : ''}
+                </div>`;
+            }
+            document.getElementById('post-list').innerHTML = h;
+        });
+    }
+
+    function sendChat() {
+        const m = document.getElementById('c-ipt').value;
+        if(m) rdb.ref('chats').push({ u: me.name, m: m, t: new Date().toLocaleTimeString() });
+        document.getElementById('c-ipt').value = '';
+    }
+
+    function sendReq() {
+        const s = document.getElementById('s-req').value;
+        if(s) { 
+            rdb.ref('reqs').push({ u: me.name, s: s, t: new Date().toLocaleString() }); 
+            document.getElementById('s-req').value = ''; alert("Đã gửi bài hát đến Admin!"); 
+        }
+    }
+
+    function approve(k, u, s_name) {
+        // Lưu vĩnh viễn vào danh sách duyệt
+        const songId = 'jfKfPfyJRdk'; // Bạn có thể thêm logic lấy ID Youtube thật tại đây
+        rdb.ref('approved_songs').push({
+            title: s_name,
+            id: songId,
+            by: u,
+            thumb: `https://i.ytimg.com/vi/${songId}/hqdefault.jpg`,
+            t: new Date().toLocaleString()
+        });
+        
+        // Cộng 100 điểm cho người gửi
+        rdb.ref('users/' + u).once('value', snapshot => {
+            const currentPts = snapshot.val().pts || 0;
+            rdb.ref('users/' + u).update({ pts: currentPts + 100 });
+        });
+
+        // Xóa khỏi danh sách chờ
+        rdb.ref('reqs/' + k).remove();
+    }
+
+    function post() {
+        const m = prompt("Bạn đang nghĩ gì?");
+        const l = prompt("Link ảnh hoặc Video (TikTok/YouTube):");
+        if(m) rdb.ref('posts').push({ u: me.name, ava: currentAva, m: m, l: l, t: new Date().toLocaleString() });
+    }
+
+    function playMusic(id, title) {
+        document.getElementById('p-title').innerText = title;
+        document.getElementById('p-img').src = `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
+        document.getElementById('yt-api').innerHTML = `<iframe src="https://www.youtube.com/embed/${id}?autoplay=1" allow="autoplay"></iframe>`;
+        document.getElementById('play-icon').className = "fa-solid fa-circle-pause p-btn";
+        isPlaying = true;
+        
+        let w = 0; clearInterval(window.progress);
+        window.progress = setInterval(() => {
+            w += 0.5; document.getElementById('p-bar').style.width = w + "%";
+            if(w>=100) shufflePlay();
+        }, 1000);
+    }
+
+    function togglePlay() {
+        if(isPlaying) {
+            document.getElementById('yt-api').innerHTML = "";
+            document.getElementById('play-icon').className = "fa-solid fa-circle-play p-btn";
+        } else {
+            shufflePlay();
+        }
+        isPlaying = !isPlaying;
+    }
+
+    function shufflePlay() {
+        rdb.ref('approved_songs').once('value', s => {
+            const data = s.val();
+            if(!data) return alert("Chưa có bài hát nào được duyệt để phát!");
+            const keys = Object.keys(data);
+            const rKey = keys[Math.floor(Math.random()*keys.length)];
+            playMusic(data[rKey].id, data[rKey].title);
+        });
+    }
+
+    function tab(v) {
+        document.querySelectorAll('.view').forEach(x => x.classList.add('hidden'));
+        document.getElementById('v-' + v).classList.remove('hidden');
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        event.currentTarget.classList.add('active');
+        if(v === 'rank') renderRank();
+    }
+
+    function renderRank() {
+        rdb.ref('users').once('value', s => {
+            let data = s.val(); let arr = [];
+            for(let k in data) arr.push({ n: k, p: data[k].pts || 0, a: data[k].ava });
+            arr.sort((a,b) => b.p - a.p);
+            document.getElementById('rank-list').innerHTML = arr.map((u, i) => `
                 <div style="display:flex; align-items:center; padding:15px; border-bottom:1px solid #222">
-                    <span style="width:30px; font-weight:bold; color:var(--p)">#${i+1}</span>
-                    <img src="${u.a}" style="width:35px; border-radius:50%; margin: 0 15px; background:#000">
-                    <span style="flex:1">${u.n}</span>
+                    <span style="width:40px; font-weight:bold; color:var(--p)">#${i+1}</span>
+                    <img src="${u.a}" style="width:45px; height:45px; border-radius:50%; margin: 0 15px; background:#000">
+                    <span style="flex:1; font-weight:700">${u.n}</span>
                     <b style="color:var(--p)">${u.p} ⭐</b>
                 </div>
             `).join('');
         });
     }
 
-    // 4. ĐIỀU HƯỚNG TAB
-    function tab(v) {
-        document.querySelectorAll('.view').forEach(x => x.classList.add('hidden'));
-        document.getElementById('v-' + v).classList.remove('hidden');
-        
-        // Nếu nhấn vào tab Rank thì mới chạy hàm vẽ bảng xếp hạng
-        if(v === 'rank') {
-            renderRank();
-        }
+    function changePass() {
+        const p = document.getElementById('set-pass').value;
+        if(p) { rdb.ref('users/' + me.name).update({ pass: p }); alert("Đổi mật khẩu thành công!"); }
     }
 
-    // 5. KHỞI CHẠY HỆ THỐNG
-    function launch() {
-        document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('main-app').style.display = 'grid';
-        if(me.isAdm) document.getElementById('adm-link').classList.remove('hidden');
-
-        // Hiển thị thông tin cá nhân
-        rdb.ref('users/' + me.name).on('value', s => {
-            const d = s.val();
-            if(d) {
-                document.getElementById('my-ava').src = d.ava;
-                document.getElementById('my-name').innerText = me.name;
-                document.getElementById('my-pts').innerText = "Điểm: " + (d.pts || 0);
-            }
-        });
-
-        // Lắng nghe Chat
-        rdb.ref('chats').limitToLast(20).on('value', s => {
-            let h = ''; const data = s.val();
-            for(let k in data) h += `<div class="msg"><b>${data[k].u}:</b> ${data[k].m}</div>`;
-            const box = document.getElementById('chat-msgs');
-            box.innerHTML = h; box.scrollTop = box.scrollHeight;
-        });
-    }
-
-    // Các hàm phụ trợ khác (giữ nguyên)
-    function selAva(el) {
-        document.querySelectorAll('.ava-p').forEach(i => i.classList.remove('active'));
-        el.classList.add('active');
-        selectedAva = el.src;
-    }
-    function sendChat() {
-        const m = document.getElementById('c-ipt').value;
-        if(m) rdb.ref('chats').push({ u: me.name, m: m });
-        document.getElementById('c-ipt').value = '';
-    }
+    function del(path, k) { if(me.isAdm) rdb.ref(path + '/' + k).remove(); }
     function logout() { sessionStorage.clear(); location.reload(); }
 </script>
+</body>
+</html>
