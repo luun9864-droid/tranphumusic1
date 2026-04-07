@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TRẦN PHÚ MUSIC | FINAL 2026</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root { --p: #1DB954; --bg: #050505; --card: #121212; --text: #ffffff; --sub: #b3b3b3; }
+        body, html { margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
+        
+        #login-screen { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; align-items: center; justify-content: center; }
+        .login-card { background: var(--card); padding: 40px; border-radius: 20px; text-align: center; width: 90%; max-width: 380px; border: 1px solid #333; }
+        .ava-p { width: 65px; height: 65px; border-radius: 50%; border: 3px solid transparent; cursor: pointer; margin: 10px; transition: 0.3s; }
+        .ava-p.active { border-color: var(--p); transform: scale(1.1); }
+        
+        input { width: 100%; padding: 14px; margin-bottom: 12px; border-radius: 10px; border: 1px solid #333; background: #000; color: #fff; box-sizing: border-box; outline: none; }
+        .btn-p { background: var(--p); color: #000; border: none; padding: 14px; border-radius: 30px; font-weight: bold; cursor: pointer; width: 100%; }
+
+        #main-app { display: none; height: 100vh; grid-template-columns: 260px 1fr 320px; grid-template-rows: 1fr 100px; }
+        .sidebar { background: #000; padding: 25px; border-right: 1px solid #222; }
+        .content { background: linear-gradient(to bottom, #181818, #050505); overflow-y: auto; padding: 30px; }
+        .right-bar { background: #000; border-left: 1px solid #222; padding: 20px; display: flex; flex-direction: column; }
+        
+        .nav-item { padding: 12px; color: var(--sub); cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 12px; border-radius: 10px; }
+        .nav-item.active { color: #fff; background: rgba(255,255,255,0.1); }
+
+        .song-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; }
+        .song-card { background: #181818; padding: 15px; border-radius: 12px; cursor: pointer; text-align: center; }
+        .song-card img { width: 100%; border-radius: 10px; }
+
+        .chat-box { flex: 1; overflow-y: auto; margin-bottom: 10px; }
+        .msg { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 10px; margin-bottom: 8px; font-size: 14px; position: relative; }
+        
+        .player { grid-column: 1 / 4; background: #000; border-top: 1px solid #222; display: flex; align-items: center; padding: 0 30px; justify-content: space-between; }
+        
+        @media (max-width: 1000px) { #main-app { grid-template-columns: 1fr; } .sidebar, .right-bar { display: none; } }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+<div id="login-screen">
+    <div class="login-card">
+        <h2 style="color:var(--p)">TRẦN PHÚ MUSIC</h2>
+        <div class="ava-box">
+            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" class="ava-p active" onclick="selAva(this)">
+            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Aneka" class="ava-p" onclick="selAva(this)">
+        </div>
+        <input type="text" id="u-name" placeholder="Tên đăng nhập">
+        <input type="password" id="u-pass" placeholder="Mật khẩu">
+        <button class="btn-p" onclick="login()">ĐĂNG NHẬP</button>
+    </div>
+</div>
+
+<div id="main-app">
+    <div class="sidebar">
+        <h3 style="color:var(--p)">TRẦN PHÚ</h3>
+        <div class="nav-item active" onclick="tab('home')"><i class="fa-solid fa-house"></i> Trang chủ</div>
+        <div class="nav-item" onclick="tab('moments')"><i class="fa-solid fa-clapperboard"></i> Khoảnh khắc</div>
+        <div class="nav-item" onclick="tab('rank')"><i class="fa-solid fa-chart-line"></i> Xếp hạng</div>
+        <div id="adm-link" class="nav-item hidden" onclick="tab('admin')" style="color:var(--p)"><i class="fa-solid fa-shield"></i> ADMIN</div>
+        
+        <div style="margin-top:auto; background: #111; padding: 15px; border-radius: 12px; text-align: center;">
+            <img id="my-ava" style="width:50px; border-radius:50%; border:2px solid var(--p)">
+            <div id="my-name" style="font-weight:bold; margin-top:5px"></div>
+            <div id="my-pts" style="color:var(--p); font-size:12px">Điểm: 0</div>
+            <button onclick="logout()" style="color:red; background:none; border:none; cursor:pointer; font-size:11px">Đăng xuất</button>
+        </div>
+    </div>
+
+    <div class="content">
+        <div id="v-home" class="view">
+            <h1>Yêu cầu nhạc</h1>
+            <div style="display:flex; gap:10px; margin-bottom:30px">
+                <input type="text" id="s-req" placeholder="Tên bài hát..." style="margin:0">
+                <button class="btn-p" style="width:100px" onclick="sendReq()">GỬI</button>
+            </div>
+            <div id="song-list" class="song-grid"></div>
+        </div>
+
+        <div id="v-moments" class="view hidden">
+            <button class="btn-p" style="width:auto; margin-bottom:20px" onclick="post()">+ ĐĂNG BÀI</button>
+            <div id="post-list" style="max-width:500px; margin:0 auto"></div>
+        </div>
+
+        <div id="v-rank" class="view hidden">
+            <h2>Bảng xếp hạng</h2>
+            <div id="rank-list"></div>
+        </div>
+
+        <div id="v-admin" class="view hidden">
+            <h2>Kiểm duyệt</h2>
+            <div id="adm-list"></div>
+        </div>
+    </div>
+
+    <div class="right-bar">
+        <h3>Chat</h3>
+        <div id="chat-msgs" class="chat-box"></div>
+        <div style="display:flex; gap:5px">
+            <input type="text" id="c-ipt" placeholder="Nhập..." style="margin:0">
+            <button class="btn-p" style="width:50px" onclick="sendChat()">></button>
+        </div>
+    </div>
+
+    <div class="player">
+        <div style="display:flex; align-items:center; gap:15px; width:300px">
+            <img id="p-img" src="https://i.ytimg.com/vi/jfKfPfyJRdk/hqdefault.jpg" style="width:55px; border-radius:5px">
+            <div id="p-title" style="font-size:14px; font-weight:bold">Chọn bài hát</div>
+        </div>
+        <div>
+            <i class="fa-solid fa-circle-play" style="font-size:40px; cursor:pointer" onclick="shuffle()"></i>
+        </div>
+        <div style="width:300px; text-align:right; font-size:10px; color:#555">Bản quyền Huỳnh Lưu</div>
+    </div>
+</div>
+
+<div id="yt-api" style="display:none"></div>
+
+<script>
+    // 1. CẤU HÌNH (Hãy đảm bảo link này đúng với Firebase của bạn)
+    const firebaseConfig = { 
+        databaseURL: "https://tranphumusic1-default-rtdb.firebaseio.com/" 
+    };
+    firebase.initializeApp(firebaseConfig);
+    const rdb = firebase.database();
+
+    let me = JSON.parse(sessionStorage.getItem('TP_USER')) || null;
+    let selectedAva = "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix";
+
+    window.onload = () => { if(me) launch(); };
+
+    // 2. HÀM LOGIN
+    function login() {
+        const u = document.getElementById('u-name').value.trim();
+        const p = document.getElementById('u-pass').value;
+        if(!u || !p) return alert("Nhập đủ thông tin!");
+
+        rdb.ref('users/' + u).once('value', s => {
+            let user = s.val();
+            if(!user) {
+                user = { pass: p, pts: 100, ava: selectedAva, last: new Date().toDateString() };
+                rdb.ref('users/' + u).set(user);
+            } else if(user.pass !== p) return alert("Sai mật khẩu!");
+            
+            me = { name: u, isAdm: (u === 'admin' && p === 'tp2026') };
+            sessionStorage.setItem('TP_USER', JSON.stringify(me));
+            launch();
+        });
+    }
+
+    // 3. HÀM HIỂN THỊ BẢNG XẾP HẠNG (FIX LỖI)
+    function renderRank() {
+        const rankList = document.getElementById('rank-list');
+        rankList.innerHTML = "<p style='padding:20px'>Đang tải dữ liệu...</p>";
+
+        rdb.ref('users').once('value', s => {
+            let data = s.val();
+            if(!data) return rankList.innerHTML = "Chưa có dữ liệu.";
+
+            let arr = [];
+            for(let k in data) {
+                arr.push({ n: k, p: data[k].pts || 0, a: data[k].ava || selectedAva });
+            }
+            
+            // Sắp xếp điểm từ cao xuống thấp
+            arr.sort((a, b) => b.p - a.p);
+
+            rankList.innerHTML = arr.map((u, i) => `
+                <div style="display:flex; align-items:center; padding:15px; border-bottom:1px solid #222">
+                    <span style="width:30px; font-weight:bold; color:var(--p)">#${i+1}</span>
+                    <img src="${u.a}" style="width:35px; border-radius:50%; margin: 0 15px; background:#000">
+                    <span style="flex:1">${u.n}</span>
+                    <b style="color:var(--p)">${u.p} ⭐</b>
+                </div>
+            `).join('');
+        });
+    }
+
+    // 4. ĐIỀU HƯỚNG TAB
+    function tab(v) {
+        document.querySelectorAll('.view').forEach(x => x.classList.add('hidden'));
+        document.getElementById('v-' + v).classList.remove('hidden');
+        
+        // Nếu nhấn vào tab Rank thì mới chạy hàm vẽ bảng xếp hạng
+        if(v === 'rank') {
+            renderRank();
+        }
+    }
+
+    // 5. KHỞI CHẠY HỆ THỐNG
+    function launch() {
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('main-app').style.display = 'grid';
+        if(me.isAdm) document.getElementById('adm-link').classList.remove('hidden');
+
+        // Hiển thị thông tin cá nhân
+        rdb.ref('users/' + me.name).on('value', s => {
+            const d = s.val();
+            if(d) {
+                document.getElementById('my-ava').src = d.ava;
+                document.getElementById('my-name').innerText = me.name;
+                document.getElementById('my-pts').innerText = "Điểm: " + (d.pts || 0);
+            }
+        });
+
+        // Lắng nghe Chat
+        rdb.ref('chats').limitToLast(20).on('value', s => {
+            let h = ''; const data = s.val();
+            for(let k in data) h += `<div class="msg"><b>${data[k].u}:</b> ${data[k].m}</div>`;
+            const box = document.getElementById('chat-msgs');
+            box.innerHTML = h; box.scrollTop = box.scrollHeight;
+        });
+    }
+
+    // Các hàm phụ trợ khác (giữ nguyên)
+    function selAva(el) {
+        document.querySelectorAll('.ava-p').forEach(i => i.classList.remove('active'));
+        el.classList.add('active');
+        selectedAva = el.src;
+    }
+    function sendChat() {
+        const m = document.getElementById('c-ipt').value;
+        if(m) rdb.ref('chats').push({ u: me.name, m: m });
+        document.getElementById('c-ipt').value = '';
+    }
+    function logout() { sessionStorage.clear(); location.reload(); }
+</script>
