@@ -3,61 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TRẦN PHÚ MUSIC | OFFICIAL 2026</title>
+    <title>TRẦN PHÚ MUSIC | OFFICIAL</title>
     
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        :root { --p: #1DB954; --bg: #050505; --card: #121212; --text: #ffffff; --sub: #b3b3b3; --glass: rgba(255, 255, 255, 0.05); }
-        body, html { margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
+        :root { --p: #1DB954; --bg: #050505; --card: #181818; --text: #ffffff; --sub: #b3b3b3; --glass: rgba(255,255,255,0.05); }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body, html { margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
         
-        /* HIỆU ỨNG NỀN HIỆN ĐẠI */
-        .bg-glow { position: fixed; inset: 0; background: radial-gradient(circle at 15% 15%, #1db95415, transparent), radial-gradient(circle at 85% 85%, #1db95410, transparent); z-index: -1; }
+        /* Hiệu ứng nền */
+        .bg-glow { position: fixed; inset: 0; background: radial-gradient(circle at 10% 10%, #1db95410, transparent), radial-gradient(circle at 90% 90%, #1db95405, transparent); z-index: -1; }
 
-        /* ĐĂNG NHẬP (Sửa lỗi đơ) */
+        /* ĐĂNG NHẬP */
         #login-screen { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; align-items: center; justify-content: center; }
-        .login-card { background: var(--card); padding: 35px; border-radius: 25px; text-align: center; width: 88%; max-width: 400px; border: 1px solid #333; box-shadow: 0 10px 50px rgba(0,0,0,0.5); }
-        .ava-p { width: 65px; height: 65px; border-radius: 50%; border: 3px solid transparent; cursor: pointer; margin: 8px; transition: 0.3s; background: #222; }
+        .login-card { background: var(--card); padding: 40px; border-radius: 20px; text-align: center; width: 90%; max-width: 400px; border: 1px solid #333; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        .ava-box { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 20px; }
+        .ava-p { width: 55px; height: 55px; border-radius: 50%; border: 3px solid transparent; cursor: pointer; transition: 0.3s; background: #333; }
         .ava-p.active { border-color: var(--p); transform: scale(1.1); box-shadow: 0 0 15px var(--p); }
-        input { width: 100%; padding: 15px; margin-bottom: 12px; border-radius: 12px; border: 1px solid #333; background: #000; color: #fff; box-sizing: border-box; outline: none; transition: 0.3s; }
-        input:focus { border-color: var(--p); }
+        input { width: 100%; padding: 15px; margin-bottom: 12px; border-radius: 10px; border: 1px solid #333; background: #000; color: #fff; outline: none; }
+        .btn-p { background: var(--p); color: #000; border: none; padding: 15px; border-radius: 30px; font-weight: 800; width: 100%; cursor: pointer; transition: 0.2s; }
+        .btn-p:active { transform: scale(0.95); }
 
-        /* GIAO DIỆN CHÍNH */
-        #main-app { display: none; height: 100vh; grid-template-columns: 260px 1fr 320px; grid-template-rows: 1fr 100px; }
+        /* LAYOUT CHÍNH */
+        #main-app { display: none; height: 100vh; grid-template-columns: 260px 1fr 320px; grid-template-rows: 1fr 90px; }
         .sidebar { background: #000; padding: 25px; border-right: 1px solid #222; display: flex; flex-direction: column; }
-        .content { overflow-y: auto; padding: 25px; position: relative; scroll-behavior: smooth; }
+        .content { overflow-y: auto; padding: 25px; scroll-behavior: smooth; }
         .right-bar { background: #000; border-left: 1px solid #222; padding: 20px; display: flex; flex-direction: column; }
 
-        /* TAB MENU */
-        .nav-item { padding: 12px 18px; color: var(--sub); cursor: pointer; font-weight: 700; display: flex; align-items: center; gap: 15px; border-radius: 10px; margin-bottom: 5px; }
+        /* MENU */
+        .nav-item { padding: 12px 15px; color: var(--sub); cursor: pointer; font-weight: 700; display: flex; align-items: center; gap: 15px; border-radius: 8px; margin-bottom: 5px; }
         .nav-item:hover, .nav-item.active { color: #fff; background: var(--glass); }
 
-        /* MOBILE MENU (Bottom Nav) */
-        .mobile-nav { display: none; position: fixed; bottom: 100px; left: 0; width: 100%; background: #111; border-top: 1px solid #222; justify-content: space-around; padding: 12px 0; z-index: 999; }
-        .m-item { color: var(--sub); text-align: center; font-size: 10px; flex: 1; cursor: pointer; }
-        .m-item i { font-size: 20px; display: block; margin-bottom: 4px; }
+        /* BOTTOM NAV (MOBILE) */
+        .mobile-nav { display: none; position: fixed; bottom: 90px; left: 0; width: 100%; background: #111; border-top: 1px solid #222; justify-content: space-around; padding: 12px 0; z-index: 1000; }
+        .m-item { color: var(--sub); text-align: center; font-size: 11px; flex: 1; cursor: pointer; }
+        .m-item i { font-size: 22px; display: block; margin-bottom: 4px; }
         .m-item.active { color: var(--p); }
 
-        /* BOXES */
-        .song-card { background: var(--card); padding: 12px; border-radius: 15px; border: 1px solid #222; cursor: pointer; transition: 0.3s; }
-        .song-card:hover { transform: translateY(-5px); border-color: var(--p); }
-        .post-card { background: var(--card); border-radius: 20px; margin-bottom: 20px; border: 1px solid #222; overflow: hidden; }
-        .msg { background: var(--glass); padding: 12px; border-radius: 15px; margin-bottom: 10px; font-size: 14px; position: relative; }
-        .msg b { color: var(--p); font-size: 12px; }
+        /* CONTENT STYLES */
+        .song-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; }
+        .song-card { background: var(--card); padding: 15px; border-radius: 12px; border: 1px solid #222; cursor: pointer; transition: 0.3s; position: relative; }
+        .song-card:hover { background: #282828; border-color: var(--p); }
+        .song-card img { width: 100%; border-radius: 8px; margin-bottom: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+
+        /* CHAT */
+        .chat-box { flex: 1; overflow-y: auto; margin-bottom: 15px; }
+        .msg { background: var(--glass); padding: 12px; border-radius: 15px; margin-bottom: 10px; font-size: 14px; line-height: 1.4; position: relative; border: 1px solid rgba(255,255,255,0.03); }
+        .msg b { color: var(--p); font-size: 12px; display: block; margin-bottom: 2px; }
+        .msg small { font-size: 9px; color: #555; position: absolute; right: 12px; bottom: 10px; }
 
         /* PLAYER */
-        .player { grid-column: 1 / 4; background: #000; border-top: 1px solid #222; display: flex; align-items: center; padding: 0 30px; justify-content: space-between; z-index: 1000; }
-        .p-btn { font-size: 24px; color: var(--sub); cursor: pointer; }
-        .p-btn:hover { color: #fff; }
+        .player { grid-column: 1 / 4; background: #000; border-top: 1px solid #222; display: flex; align-items: center; padding: 0 30px; justify-content: space-between; position: relative; }
+        .p-info { display: flex; align-items: center; gap: 15px; width: 30%; }
+        .p-ctrls { display: flex; align-items: center; gap: 25px; justify-content: center; flex: 1; }
+        .p-extra { width: 30%; text-align: right; font-size: 11px; color: #444; }
+
+        /* ADMIN PANEL TRÊN ĐIỆN THOẠI */
+        #v-admin-mobile { padding-bottom: 50px; }
+        .adm-req-card { background: var(--glass); border: 1px solid #333; padding: 15px; border-radius: 12px; margin-bottom: 12px; }
 
         @media (max-width: 1000px) {
             #main-app { grid-template-columns: 1fr; }
             .sidebar, .right-bar { display: none; }
             .mobile-nav { display: flex; }
             .content { padding-bottom: 180px; }
-            .player { position: fixed; bottom: 0; width: 100%; height: 100px; box-sizing: border-box; }
+            .player { position: fixed; bottom: 0; width: 100%; height: 90px; padding: 0 15px; }
+            .p-info { width: 60%; }
+            .p-extra { display: none; }
         }
         .hidden { display: none !important; }
     </style>
@@ -68,68 +83,71 @@
 
 <div id="login-screen">
     <div class="login-card">
-        <h2 style="margin:0 0 10px 0; color:var(--p)">TRẦN PHÚ MUSIC</h2>
-        <p style="font-size:12px; color:var(--sub); margin-bottom: 20px">CLB TRUYỀN THÔNG - THPT TRẦN PHÚ</p>
+        <h2 style="color:var(--p); margin:0">TRẦN PHÚ MUSIC</h2>
+        <p style="color:var(--sub); font-size: 11px; margin-bottom: 25px">CLB TRUYỀN THÔNG | THPT TRẦN PHÚ</p>
         
-        <div style="margin-bottom: 20px">
+        <div class="ava-box">
             <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" class="ava-p active" onclick="selAva(this)">
             <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Aneka" class="ava-p" onclick="selAva(this)">
             <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Max" class="ava-p" onclick="selAva(this)">
             <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Bella" class="ava-p" onclick="selAva(this)">
+            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Oliver" class="ava-p" onclick="selAva(this)">
+            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Luna" class="ava-p" onclick="selAva(this)">
         </div>
 
-        <input type="text" id="u-name" placeholder="Tên tài khoản...">
+        <input type="text" id="u-name" placeholder="Tên đăng nhập...">
         <input type="password" id="u-pass" placeholder="Mật khẩu...">
-        <button class="btn-p" onclick="login()">ĐĂNG NHẬP / ĐĂNG KÝ</button>
-        <p style="font-size:10px; color:#555; margin-top:15px">Mỗi thiết bị tối đa 2 tài khoản</p>
+        <button class="btn-p" id="login-btn" onclick="login()">BẮT ĐẦU TRẢI NGHIỆM</button>
     </div>
 </div>
 
 <div id="main-app">
     <div class="sidebar">
-        <div style="font-size: 22px; font-weight: 900; color: var(--p); margin-bottom: 35px;"><i class="fa-solid fa-graduation-cap"></i> TP MUSIC</div>
-        <div class="nav-item active" onclick="tab('home')"><i class="fa-solid fa-music"></i> Âm nhạc</div>
-        <div class="nav-item" onclick="tab('moments')"><i class="fa-solid fa-clapperboard"></i> Moments</div>
-        <div class="nav-item" onclick="tab('chat')"><i class="fa-solid fa-comments"></i> Chat Box</div>
-        <div class="nav-item" onclick="tab('rank')"><i class="fa-solid fa-trophy"></i> Xếp hạng</div>
-        <div class="nav-item" onclick="tab('settings')"><i class="fa-solid fa-gear"></i> Cài đặt</div>
-        <div id="adm-link" class="nav-item hidden" style="color:var(--p); border-top: 1px solid #222; margin-top:10px; padding-top:15px" onclick="tab('admin')"><i class="fa-solid fa-user-shield"></i> KIỂM DUYỆT</div>
+        <div style="font-size: 22px; font-weight: 900; color: var(--p); margin-bottom: 35px;"><i class="fa-solid fa-school"></i> TP MUSIC</div>
+        <div class="nav-item active" onclick="tab('home')"><i class="fa-solid fa-house"></i> Âm nhạc</div>
+        <div class="nav-item" onclick="tab('moments')"><i class="fa-solid fa-bolt"></i> Moments</div>
+        <div class="nav-item" onclick="tab('chat')"><i class="fa-solid fa-comment-dots"></i> Trò chuyện</div>
+        <div class="nav-item" onclick="tab('rank')"><i class="fa-solid fa-chart-line"></i> Bảng xếp hạng</div>
+        <div class="nav-item" onclick="tab('settings')"><i class="fa-solid fa-sliders"></i> Cài đặt</div>
+        <div id="adm-nav" class="nav-item hidden" style="color:var(--p); border-top: 1px solid #222; margin-top:10px; padding-top:15px" onclick="tab('admin')">
+            <i class="fa-solid fa-user-shield"></i> KIỂM DUYỆT
+        </div>
 
-        <div style="margin-top:auto; background:var(--glass); padding:15px; border-radius:15px; text-align:center">
-            <img id="my-ava" style="width:50px; border-radius:50%; border:2px solid var(--p)">
-            <div id="my-name" style="font-weight:bold; font-size:14px; margin:5px 0"></div>
-            <div id="my-pts" style="color:var(--p); font-size:12px; font-weight:900">Điểm: 0</div>
-            <button onclick="logout()" style="color:red; background:none; border:none; margin-top:10px; cursor:pointer; font-size:11px">Đăng xuất</button>
+        <div style="margin-top:auto; background:var(--glass); padding:20px; border-radius:15px; text-align:center">
+            <img id="my-ava" style="width:55px; border-radius:50%; border:2px solid var(--p)">
+            <div id="my-name" style="font-weight:800; margin:10px 0 5px"></div>
+            <div id="my-pts" style="color:var(--p); font-size:13px; font-weight:900">0 ⭐</div>
+            <button onclick="logout()" style="background:none; border:none; color:red; margin-top:15px; font-size:12px; cursor:pointer">Đăng xuất</button>
         </div>
     </div>
 
     <div class="content">
         <div id="v-home" class="view">
-            <h1 id="daily-quote" style="margin:0; font-size: 28px;">Đang tải lời hay ý đẹp...</h1>
-            <div style="background:linear-gradient(90deg, #1db95422, transparent); padding:25px; border-radius:20px; margin: 25px 0; border: 1px solid #1db95433">
-                <h3>Gửi bài hát tặng bạn bè</h3>
-                <div style="display:flex; gap:10px">
-                    <input type="text" id="s-req" placeholder="Tên bài hát + Tên người gửi..." style="margin:0">
-                    <button class="btn-p" style="width:120px" onclick="sendReq()">GỬI ADMIN</button>
+            <h1 id="quote" style="font-size: 32px; margin:0">Chào bạn!</h1>
+            <div style="background: linear-gradient(135deg, #1db95433, transparent); padding: 30px; border-radius: 20px; margin: 25px 0; border: 1px solid #1db95422">
+                <h3 style="margin-top:0">Gửi yêu cầu bài hát</h3>
+                <div style="display:flex; gap:12px">
+                    <input type="text" id="s-req" placeholder="Tên bài hát hoặc link YouTube..." style="margin:0">
+                    <button class="btn-p" style="width:140px" onclick="sendReq()">GỬI YÊU CẦU</button>
                 </div>
             </div>
-            <h3 style="margin-bottom:20px"><i class="fa-solid fa-circle-check" style="color:var(--p)"></i> ĐÃ DUYỆT & GỢI Ý</h3>
-            <div id="approved-list" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(160px, 1fr)); gap:20px"></div>
+            <h2 style="margin-bottom:20px"><i class="fa-solid fa-heart" style="color:var(--p)"></i> Thư viện âm nhạc</h2>
+            <div id="song-list" class="song-grid"></div>
         </div>
 
         <div id="v-moments" class="view hidden">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px">
                 <h2>Khoảnh khắc Trần Phú</h2>
-                <button class="btn-p" style="width:auto; padding:10px 25px" onclick="post()">+ ĐĂNG MOMENT</button>
+                <button class="btn-p" style="width:auto; padding:10px 25px" onclick="post()">+ ĐĂNG BÀI</button>
             </div>
-            <div id="post-list" style="max-width:500px; margin:0 auto"></div>
+            <div id="post-list" style="max-width:550px; margin:0 auto"></div>
         </div>
 
         <div id="v-chat" class="view hidden">
-            <h2>Trò chuyện công đồng</h2>
-            <div id="chat-msgs-m" style="height:60vh; overflow-y:auto; padding-right:10px" class="chat-box"></div>
-            <div style="display:flex; gap:10px; margin-top:15px">
-                <input type="text" id="c-ipt-m" placeholder="Nhắn gì đó..." style="margin:0">
+            <h2>Kênh Chat Công Đồng</h2>
+            <div id="chat-msgs-m" style="height:60vh" class="chat-box"></div>
+            <div style="display:flex; gap:10px">
+                <input type="text" id="c-ipt-m" placeholder="Bạn đang nghĩ gì..." style="margin:0">
                 <button class="btn-p" style="width:60px" onclick="sendChat('m')"><i class="fa-solid fa-paper-plane"></i></button>
             </div>
         </div>
@@ -140,55 +158,54 @@
         </div>
 
         <div id="v-settings" class="view hidden">
-            <h2>Cài đặt & Bảo mật</h2>
+            <h2>Cài đặt cá nhân</h2>
             <div style="background:var(--card); padding:30px; border-radius:20px; border:1px solid #222; max-width:400px">
-                <p>Đổi mật khẩu mới:</p>
+                <p>Cập nhật mật khẩu mới:</p>
                 <input type="password" id="set-pass" placeholder="Mật khẩu mới">
-                <button class="btn-p" onclick="changePass()">CẬP NHẬT MẬT KHẨU</button>
+                <button class="btn-p" onclick="changePass()">LƯU THAY ĐỔI</button>
             </div>
         </div>
 
         <div id="v-admin" class="view hidden">
-            <h2 style="color:var(--p)">Yêu cầu đang chờ duyệt</h2>
+            <h2 style="color:var(--p)">Yêu cầu đang chờ (Admin)</h2>
             <div id="adm-list"></div>
         </div>
     </div>
 
     <div class="right-bar">
         <h3><i class="fa-solid fa-comments"></i> Chat Box</h3>
-        <div id="chat-msgs" class="chat-box" style="flex:1; overflow-y:auto"></div>
-        <div style="display:flex; gap:10px; margin-top:15px">
+        <div id="chat-msgs" class="chat-box"></div>
+        <div style="display:flex; gap:10px">
             <input type="text" id="c-ipt" placeholder="Nhắn tin..." style="margin:0">
             <button class="btn-p" style="width:55px" onclick="sendChat('pc')">></button>
         </div>
     </div>
 
     <div class="mobile-nav">
-        <div class="m-item active" onclick="tab('home')"><i class="fa-solid fa-house"></i>Nhạc</div>
+        <div class="m-item active" onclick="tab('home')"><i class="fa-solid fa-music"></i>Nhạc</div>
         <div class="m-item" onclick="tab('moments')"><i class="fa-solid fa-play"></i>Moments</div>
         <div class="m-item" onclick="tab('chat')"><i class="fa-solid fa-message"></i>Chat</div>
-        <div class="m-item" onclick="tab('rank')"><i class="fa-solid fa-trophy"></i>BXH</div>
+        <div id="adm-nav-m" class="m-item hidden" style="color:var(--p)" onclick="tab('admin')"><i class="fa-solid fa-shield"></i>Duyệt</div>
+        <div class="m-item" onclick="tab('rank')"><i class="fa-solid fa-trophy"></i>Top</div>
         <div class="m-item" onclick="tab('settings')"><i class="fa-solid fa-user"></i>Tôi</div>
     </div>
 
     <div class="player">
-        <div style="display:flex; align-items:center; gap:15px; width:300px">
-            <img id="p-img" src="https://api.dicebear.com/7.x/shapes/svg?seed=music" style="width:60px; height:60px; border-radius:10px; border:1px solid #333">
+        <div class="p-info">
+            <img id="p-img" src="https://api.dicebear.com/7.x/shapes/svg?seed=music" style="width:60px; height:60px; border-radius:8px; border:1px solid #333">
             <div style="overflow:hidden">
-                <b id="p-title" style="font-size:14px; white-space:nowrap">Chọn nhạc để phát...</b><br>
-                <small style="color:var(--p); font-size:10px; font-weight:900">TP MUSIC OFFICIAL</small>
+                <b id="p-title" style="font-size:14px; white-space:nowrap">Đang chờ...</b><br>
+                <small style="color:var(--p); font-size:10px; font-weight:800">TP MUSIC SYSTEM</small>
             </div>
         </div>
-        <div style="flex:1; text-align:center">
-            <div style="display:flex; align-items:center; justify-content:center; gap:30px">
-                <i class="fa-solid fa-shuffle p-btn" onclick="shufflePlay()"></i>
-                <i class="fa-solid fa-circle-play p-btn" style="font-size:50px; color:#fff" id="p-icon" onclick="togglePlay()"></i>
-                <i class="fa-solid fa-forward-step p-btn" onclick="shufflePlay()"></i>
-            </div>
+        <div class="p-ctrls">
+            <i class="fa-solid fa-shuffle" style="color:var(--sub); cursor:pointer" onclick="shufflePlay()"></i>
+            <i class="fa-solid fa-circle-play" style="font-size:50px; color:#fff; cursor:pointer" id="p-icon" onclick="togglePlay()"></i>
+            <i class="fa-solid fa-forward-step" style="color:var(--sub); cursor:pointer" onclick="shufflePlay()"></i>
         </div>
-        <div style="width:300px; text-align:right; font-size:11px; color:#444; line-height:1.6">
+        <div class="p-extra">
             Bản quyền © <b>HUỲNH LƯU</b><br>
-            Điều hành: <b>CLB TRUYỀN THÔNG</b>
+            Nhà điều hành: <b>CLB TRUYỀN THÔNG</b>
         </div>
     </div>
 </div>
@@ -196,18 +213,18 @@
 <div id="yt-api" style="display:none"></div>
 
 <script>
-    // --- FIREBASE CẤU HÌNH ---
+    // --- FIREBASE CONFIG ---
     const firebaseConfig = { databaseURL: "https://tranphumusic1-default-rtdb.firebaseio.com/" };
     firebase.initializeApp(firebaseConfig);
     const rdb = firebase.database();
 
-    let me = JSON.parse(sessionStorage.getItem('TP_USER')) || null;
+    let me = JSON.parse(localStorage.getItem('TP_USER_LITE')) || null;
     let selectedAva = "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix";
     let isPlaying = false;
-    const myQuotes = ["Hãy sống như một đóa hoa rực rỡ nhất!", "Trần Phú trong tim tôi.", "Âm nhạc là ngôn ngữ chung của thế giới.", "Đừng bao giờ từ bỏ ước mơ của bạn."];
+    const quotes = ["Sống là để cống hiến!", "Trần Phú - Nơi tình yêu bắt đầu.", "Âm nhạc kết nối trái tim.", "Hôm nay bạn tuyệt vời nhất!"];
 
     window.onload = () => {
-        document.getElementById('daily-quote').innerText = myQuotes[Math.floor(Math.random()*myQuotes.length)];
+        document.getElementById('quote').innerText = quotes[Math.floor(Math.random()*quotes.length)];
         if(me) launch();
     };
 
@@ -219,23 +236,28 @@
     function login() {
         const u = document.getElementById('u-name').value.trim();
         const p = document.getElementById('u-pass').value;
-        if(!u || !p) return alert("Nhập đủ thông tin!");
+        if(!u || !p) return alert("Vui lòng nhập đủ!");
+
+        document.getElementById('login-btn').innerText = "Đang kết nối...";
 
         rdb.ref('users/' + u).once('value', s => {
             let user = s.val();
             if(!user) {
                 user = { pass: p, pts: 100, ava: selectedAva, last: new Date().toDateString() };
                 rdb.ref('users/' + u).set(user);
-            } else if(user.pass !== p) return alert("Sai mật khẩu!");
+            } else if(user.pass !== p) {
+                alert("Sai mật khẩu!");
+                document.getElementById('login-btn').innerText = "BẮT ĐẦU TRẢI NGHIỆM";
+                return;
+            }
 
             // Điểm danh ngày mới
             if(user.last !== new Date().toDateString()) {
                 rdb.ref('users/' + u).update({ pts: (user.pts || 0) + 100, last: new Date().toDateString() });
-                alert("Bạn được +100 điểm danh ngày mới!");
             }
 
             me = { name: u, isAdm: (u === 'admin' && p === 'tp2026') };
-            sessionStorage.setItem('TP_USER', JSON.stringify(me));
+            localStorage.setItem('TP_USER_LITE', JSON.stringify(me));
             location.reload();
         });
     }
@@ -243,25 +265,25 @@
     function launch() {
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('main-app').style.display = 'grid';
-        if(me.isAdm) document.getElementById('adm-link').classList.remove('hidden');
+        if(me.isAdm) {
+            document.getElementById('adm-nav').classList.remove('hidden');
+            document.getElementById('adm-nav-m').classList.remove('hidden');
+        }
 
-        // Dữ liệu cá nhân
         rdb.ref('users/' + me.name).on('value', s => {
             const d = s.val();
-            if(d) {
-                document.getElementById('my-ava').src = d.ava;
-                document.getElementById('my-name').innerText = me.name;
-                document.getElementById('my-pts').innerText = "Điểm: " + (d.pts || 0);
-            }
+            document.getElementById('my-ava').src = d.ava;
+            document.getElementById('my-name').innerText = me.name;
+            document.getElementById('my-pts').innerText = (d.pts || 0) + " ⭐";
         });
 
-        // Chat (Đồng nhất mọi thiết bị)
+        // Chat đồng nhất
         rdb.ref('chats').limitToLast(40).on('value', s => {
             let h = ''; const data = s.val();
             for(let k in data) {
                 h += `<div class="msg">
                     <b>${data[k].u}:</b> ${data[k].m} 
-                    <small style="font-size:8px; color:#555; position:absolute; right:10px; bottom:5px">${data[k].t}</small>
+                    <small>${data[k].t}</small>
                     ${me.isAdm ? `<i class="fa-solid fa-trash" style="color:red; float:right; cursor:pointer" onclick="del('chats','${k}')"></i>` : ''}
                 </div>`;
             }
@@ -271,50 +293,49 @@
             document.getElementById('chat-msgs-m').scrollTop = 9999;
         });
 
-        // Nhạc đã duyệt (Vĩnh viễn)
-        rdb.ref('approved_permanently').on('value', s => {
+        // Nhạc vĩnh viễn
+        rdb.ref('permanent_library').on('value', s => {
             let h = ''; const data = s.val();
             for(let k in data) {
                 h += `<div class="song-card" onclick="play('${data[k].id}','${data[k].t}')">
-                    <img src="https://i.ytimg.com/vi/${data[k].id}/hqdefault.jpg" style="width:100%; border-radius:10px; margin-bottom:10px">
+                    <img src="https://i.ytimg.com/vi/${data[k].id}/hqdefault.jpg">
                     <b style="font-size:13px; height:34px; display:block; overflow:hidden">${data[k].t}</b>
-                    <small style="color:var(--p); font-size:10px">Người gửi: ${data[k].by}</small>
+                    <small style="color:var(--p); font-size:10px">Gửi bởi: ${data[k].by}</small>
                 </div>`;
             }
-            document.getElementById('approved-list').innerHTML = h || '<p>Chưa có bài hát nào.</p>';
+            document.getElementById('song-list').innerHTML = h || '<p>Chưa có nhạc.</p>';
         });
 
         // Moments
         rdb.ref('posts').on('value', s => {
             let h = ''; const data = s.val();
             for(let k in data) {
-                const p = data[k];
-                h += `<div class="post-card">
+                h += `<div style="background:var(--card); border-radius:15px; margin-bottom:20px; border:1px solid #333; overflow:hidden">
                     <div style="padding:15px; display:flex; align-items:center; gap:10px">
-                        <img src="${p.ava}" style="width:35px; border-radius:50%"> <b>${p.u}</b>
+                        <img src="${data[k].ava}" style="width:35px; border-radius:50%"> <b>${data[k].u}</b>
                     </div>
-                    <div style="padding:0 15px 15px">${p.m}</div>
-                    ${p.l ? `<img src="${p.l}" style="width:100%; cursor:pointer" onclick="window.open('${p.l}')">` : ''}
-                    ${me.isAdm ? `<button onclick="del('posts','${k}')" style="color:red; background:none; border:none; padding:15px; cursor:pointer">XÓA BÀI NÀY</button>` : ''}
+                    <div style="padding:0 15px 15px">${data[k].m}</div>
+                    ${data[k].l ? `<img src="${data[k].l}" style="width:100%">` : ''}
+                    ${me.isAdm ? `<button onclick="del('posts','${k}')" style="color:red; background:none; border:none; padding:10px; cursor:pointer">XÓA BÀI</button>` : ''}
                 </div>`;
             }
             document.getElementById('post-list').innerHTML = h;
         });
 
-        // Admin Duyệt bài
+        // Admin Request (Duyệt được trên điện thoại)
         if(me.isAdm) {
             rdb.ref('reqs').on('value', s => {
                 let h = ''; const data = s.val();
                 for(let k in data) {
-                    h += `<div style="background:var(--glass); padding:15px; margin-bottom:10px; border-radius:12px">
-                        <b>${data[k].u}</b> gửi: <b>${data[k].s}</b><br><small>${data[k].t}</small>
+                    h += `<div class="adm-req-card">
+                        <b>${data[k].u}</b> gửi: ${data[k].s}<br><small>${data[k].t}</small>
                         <div style="margin-top:10px; display:flex; gap:10px">
-                            <button class="btn-p" style="width:80px" onclick="approve('${k}','${data[k].u}','${data[k].s}')">DUYỆT</button>
-                            <button onclick="del('reqs','${k}')" style="background:red; color:white; border:none; border-radius:10px; padding:0 15px; cursor:pointer">XÓA</button>
+                            <button class="btn-p" style="height:35px; padding:0" onclick="approve('${k}','${data[k].u}','${data[k].s}')">DUYỆT</button>
+                            <button onclick="del('reqs','${k}')" style="background:red; color:#fff; border:none; border-radius:20px; padding:0 15px; cursor:pointer">XÓA</button>
                         </div>
                     </div>`;
                 }
-                document.getElementById('adm-list').innerHTML = h;
+                document.getElementById('adm-list').innerHTML = h || '<p>Không có yêu cầu nào.</p>';
             });
         }
     }
@@ -322,14 +343,12 @@
     function approve(k, u, sname) {
         const id = prompt("Dán Youtube Video ID (ví dụ: gaG0v-Lp1t8):");
         if(id) {
-            // Lưu vĩnh viễn
-            rdb.ref('approved_permanently').push({ id: id, t: sname, by: u, t_stamp: new Date().toLocaleString() });
-            // Cộng 100 điểm
+            rdb.ref('permanent_library').push({ id: id, t: sname, by: u });
             rdb.ref('users/' + u).once('value', sn => {
                 rdb.ref('users/' + u).update({ pts: (sn.val().pts || 0) + 100 });
             });
             rdb.ref('reqs/' + k).remove();
-            alert("Đã duyệt vĩnh viễn và cộng điểm cho người gửi!");
+            alert("Đã duyệt vĩnh viễn!");
         }
     }
 
@@ -342,7 +361,7 @@
 
     function sendReq() {
         const s = document.getElementById('s-req').value;
-        if(s) { rdb.ref('reqs').push({ u: me.name, s: s, t: new Date().toLocaleString() }); alert("Gửi thành công!"); }
+        if(s) { rdb.ref('reqs').push({ u: me.name, s: s, t: new Date().toLocaleString() }); alert("Đã gửi đến Admin!"); }
         document.getElementById('s-req').value = '';
     }
 
@@ -350,12 +369,22 @@
         document.getElementById('p-title').innerText = t;
         document.getElementById('p-img').src = `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
         document.getElementById('yt-api').innerHTML = `<iframe src="https://www.youtube.com/embed/${id}?autoplay=1" allow="autoplay"></iframe>`;
-        document.getElementById('p-icon').className = "fa-solid fa-circle-pause p-btn";
+        document.getElementById('p-icon').className = "fa-solid fa-circle-pause";
         isPlaying = true;
     }
 
+    function togglePlay() {
+        if(isPlaying) {
+            document.getElementById('yt-api').innerHTML = "";
+            document.getElementById('p-icon').className = "fa-solid fa-circle-play";
+        } else {
+            shufflePlay();
+        }
+        isPlaying = !isPlaying;
+    }
+
     function shufflePlay() {
-        rdb.ref('approved_permanently').once('value', s => {
+        rdb.ref('permanent_library').once('value', s => {
             const data = s.val(); if(!data) return;
             const keys = Object.keys(data);
             const r = data[keys[Math.floor(Math.random()*keys.length)]];
@@ -363,19 +392,9 @@
         });
     }
 
-    function togglePlay() {
-        if(isPlaying) {
-            document.getElementById('yt-api').innerHTML = "";
-            document.getElementById('p-icon').className = "fa-solid fa-circle-play p-btn";
-        } else {
-            shufflePlay();
-        }
-        isPlaying = !isPlaying;
-    }
-
     function post() {
-        const m = prompt("Bạn muốn chia sẻ điều gì?");
-        const l = prompt("Link ảnh/video:");
+        const m = prompt("Cảm nghĩ của bạn:");
+        const l = prompt("Link ảnh/video (nếu có):");
         if(m) rdb.ref('posts').push({ u: me.name, ava: document.getElementById('my-ava').src, m: m, l: l });
     }
 
@@ -386,9 +405,9 @@
             arr.sort((a,b) => b.p - a.p);
             document.getElementById('rank-list').innerHTML = arr.map((u, i) => `
                 <div style="display:flex; align-items:center; padding:15px; border-bottom:1px solid #222">
-                    <span style="width:35px; color:var(--p); font-weight:bold">#${i+1}</span>
-                    <img src="${u.a}" style="width:40px; border-radius:50%; margin: 0 15px; background:#000">
-                    <span style="flex:1; font-weight:bold">${u.n}</span>
+                    <span style="width:40px; color:var(--p); font-weight:bold">#${i+1}</span>
+                    <img src="${u.a}" style="width:40px; border-radius:50%; margin: 0 15px">
+                    <span style="flex:1; font-weight:700">${u.n}</span>
                     <b style="color:var(--p)">${u.p} ⭐</b>
                 </div>
             `).join('');
@@ -398,18 +417,16 @@
     function tab(v) {
         document.querySelectorAll('.view').forEach(x => x.classList.add('hidden'));
         document.getElementById('v-' + v).classList.remove('hidden');
-        document.querySelectorAll('.m-item').forEach(n => n.classList.remove('active'));
-        const idx = {home:0, moments:1, chat:2, rank:3, settings:4}[v];
-        if(idx !== undefined) document.querySelectorAll('.m-item')[idx].classList.add('active');
+        document.querySelectorAll('.m-item, .nav-item').forEach(n => n.classList.remove('active'));
         if(v === 'rank') renderRank();
     }
 
     function changePass() {
         const p = document.getElementById('set-pass').value;
-        if(p) { rdb.ref('users/' + me.name).update({ pass: p }); alert("Đã đổi mật khẩu!"); }
+        if(p) { rdb.ref('users/' + me.name).update({ pass: p }); alert("Đã đổi!"); }
     }
     function del(path, k) { if(me.isAdm) rdb.ref(path + '/' + k).remove(); }
-    function logout() { sessionStorage.clear(); location.reload(); }
+    function logout() { localStorage.removeItem('TP_USER_LITE'); location.reload(); }
 </script>
 </body>
 </html>
